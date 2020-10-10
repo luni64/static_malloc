@@ -1,6 +1,3 @@
-#include "Arduino.h"
-void ISR();
-
 #include <new>                                     // need to include <new> for placement new
 #include "static_malloc.h"
 
