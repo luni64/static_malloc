@@ -1,0 +1,21 @@
+{
+  "name": "static_malloc",
+  "keywords": "",
+  "description": "",
+  "repository":
+  {
+    "type": "git",
+    "url": "https://github.com/luni64/static_malloc"
+  },
+  "authors":
+  {
+    "name": "Lutz Niggl",
+    "email": "lutz.niggl@lunoptics.com",
+    "url": "https://github.com/luni64",
+    "maintainer": true
+  },
+  "homepage": "https://github.com/luni64/static_malloc",
+  "version": "0.0.1",
+  "frameworks": "arduino",
+  "platforms": "Teensy"
+}

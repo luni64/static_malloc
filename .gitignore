@@ -1,0 +1,4 @@
+makefile
+**/extras/**
+**/.vscode/**
+**/.vsteensy/**
