@@ -1,10 +1,10 @@
 # static_malloc
 
-This library is just a Arduino wrapper around [Andrey Rys](https://github.com/electrorys) static memory allocator library **smalloc** (https://github.com/electrorys/smalloc). The full credit for the very useful code goes to Andrey of course.
+This library is just an Arduino wrapper around [Andrey Rys](https://github.com/electrorys) static memory allocator library **smalloc** (https://github.com/electrorys/smalloc). The full credit for the very useful code goes to Andrey of course.
 
-For the convenience of Arduino users I sorted the original files in the folders required by the [Arduino library specification](https://arduino.github.io/arduino-cli/library-specification/). And added a few usage examples.
+For the convenience of Arduino users I sorted the original files in the folders required by the [Arduino library specification](https://arduino.github.io/arduino-cli/library-specification/) and added a few usage examples. I also added a header handling `extern "C"` wrapper required for the usual Arduino ino/cpp projects. 
 
-The main purpose for the library is to allow dynamic memory allocation on a predefined static buffer. Since this buffer can be placed wherever you want, it can also be placed on external memory.
+The main purpose of the library is to allow dynamic memory allocation on a predefined static buffer. Since this buffer can be placed wherever you want, it can also be placed on external memory chips likke the 8MB PSRam chip on the Teensy 4.1.
 
 Here a quick example showing the usage:
 
