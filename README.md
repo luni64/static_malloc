@@ -1,4 +1,4 @@
-# static_alloc
+# static_malloc
 
 This library is just a Arduino wrapper around [Andrey Rys](https://github.com/electrorys) static memory allocator library **smalloc** (https://github.com/electrorys/smalloc). The full credit for the very useful code goes to Andrey of course.
 
