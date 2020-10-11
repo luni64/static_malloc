@@ -2,8 +2,8 @@
 #include "oscilloscope.h"
 #include "static_malloc.h"
 
-constexpr size_t myHeapSize = 1024 * 200; // 100kB memory pool ...
-uint8_t myHeap[myHeapSize];        // ... on external RAM
+constexpr size_t bufSize = 1024 * 200; // 100kB memory pool ...
+uint8_t myHeap[bufSize];        // ... on external RAM
 
 //----------------------
 
@@ -13,7 +13,7 @@ constexpr uint8_t stopPin = 2;
 
 void setup()
 {
-    sm_set_default_pool(myHeap, myHeapSize, false, nullptr); // initialize memory pool
+    sm_set_default_pool(myHeap, bufSize, false, nullptr); // initialize memory pool
 
     pinMode(stopPin, INPUT_PULLUP);                          // pin to stop measurement and print results
     scope.begin(0, 1'000);                                   // scope on pin 0 with buffer for 1k transitions (class uses buffer from mem pool)

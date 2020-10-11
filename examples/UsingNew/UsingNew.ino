@@ -1,8 +1,8 @@
 #include <new>                                     // need to include <new> for placement new
 #include "static_malloc.h"
 
-constexpr size_t myHeapSize = 1024 * 100;
-EXTMEM uint8_t myHeap[myHeapSize];                 // 100kB memory pool on the external ram chip
+constexpr size_t bufSize = 1024 * 100;
+EXTMEM uint8_t myHeap[bufSize];                 // 100kB memory pool on the external ram chip
 
 //----------------------
 
@@ -14,7 +14,7 @@ IntervalTimer* timer;
 
 void setup()
 {
-    sm_set_default_pool(myHeap, myHeapSize, false, nullptr);
+    sm_set_default_pool(myHeap, bufSize, false, nullptr);
 
     pinMode(LED_BUILTIN, OUTPUT);
 
