@@ -1,10 +1,10 @@
 # static_malloc
 
-This library is just an Arduino wrapper around [Andrey Rys](https://github.com/electrorys) static memory allocator library **smalloc** (https://github.com/electrorys/smalloc). The full credit for the very useful code goes to Andrey of course. Here the [man-page of smalloc](manpage.txt)
+This library is just an Arduino wrapper around [Andrey Rys](https://github.com/electrorys) static memory allocator library **smalloc** (https://github.com/electrorys/smalloc). The full credit for the very useful code goes to Andrey of course. Here his [man-page of smalloc](manpage.txt)
 
-For the convenience of Arduino users I sorted the original files in the folders required by the [Arduino library specification](https://arduino.github.io/arduino-cli/library-specification/) and added a few usage examples. I also added a header handling `extern "C"` wrapper required for the usual Arduino ino/cpp projects.
+For the convenience of Arduino users I sorted the original files into the folders required by the [Arduino library specification](https://arduino.github.io/arduino-cli/library-specification/) and added a few usage examples. I also added a header handling the `extern "C"` wrapper which is required for the usual Arduino ino/cpp projects.
 
-The main purpose of the library is to allow dynamic memory allocation on a predefined static buffer. Since this buffer can be placed wherever you want, it can also be placed on external memory chips likke the 8MB PSRam chip on the Teensy 4.1.
+The main purpose of this library is to enable dynamic memory allocation on one or more predefined static buffers. This buffer can be placed wherever you want. Thus, the library can easily be used to dynamically access external memory chips like the optional 8MB PSRAM on the Teensy 4.1.
 
 Here a quick example showing the usage:
 
@@ -43,9 +43,6 @@ void loop()
 }
 ```
 
-Off course smalloc also provides `sm_free` and `sm_calloc`. It can also be used to handle more than one memory pool which might come in handy from time to time.
+Off course, smalloc also provides `sm_free` and `sm_calloc`. Additionally, it can be used to handle more than one memory pool in parallel and provides an "out of memory" callback.
 
-smalloc also provides a "out of memory" callback.
-
-See the examples folder in the sources for more examples.
-
+See the [examples folder](./examples/) in the sources for more examples.
