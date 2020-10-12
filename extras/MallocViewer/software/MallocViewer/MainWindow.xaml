@@ -1,0 +1,67 @@
+﻿<Window x:Class="MallocViewer.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:MallocViewer"
+        mc:Ignorable="d"
+        Title="Memory Fragmentation Viewer" MaxHeight="750" MinHeight="700" Width="1200" Closing="Window_Closing">
+
+    <DockPanel>
+        <StatusBar DockPanel.Dock="Bottom">
+            <StatusBarItem Margin="5,2,5,2" >
+                <ComboBox Name="cbTeensy" Width="170" SelectedIndex="0" DisplayMemberPath="BoardId" />
+            </StatusBarItem>
+            <StatusBarItem Margin="0,5,10,5" >
+                <Button Content=" Connect " Click="ConnectButton_Click" />
+            </StatusBarItem>
+            <StatusBarItem>
+                <TextBlock Name="conText" Text="Not connected" />
+            </StatusBarItem>
+        </StatusBar>
+        <Grid DockPanel.Dock="Top">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Margin="0,40,0,20" >
+                <Button Name="btnStart"  Content="Start" Width="80" Margin="0,0,20,0" Click="StartButton_Click" IsEnabled="False"/>
+                <Button Name ="btnStop" Content="Stop" Width="80" Click="StopButton_Click"/>
+            </StackPanel>
+
+            <StackPanel Margin="20" Grid.Row="0" Grid.RowSpan="2" >
+                <TextBlock Text="800x70=56'000 bytes" FontSize="14"/>
+                <Border BorderThickness="2" BorderBrush="DarkGray" CornerRadius="10" HorizontalAlignment="Left" VerticalAlignment="Top" Padding="5"  Background="#FFE5FFE5" >
+                    <Canvas x:Name="cnv" Width="256" Height="256"/>
+                </Border>
+            </StackPanel>
+
+            <StackPanel  Grid.Row="1" Grid.Column="1" TextBlock.FontSize="14">
+                <TextBlock Text="Allocations:"/>
+                <TextBlock Text="Allocated #:"/>
+                <TextBlock Text="Total allocated (bytes):"/>
+                <TextBlock Text="User allocated (byte):"/>
+                <TextBlock Text="Free: (byte):"/>
+            </StackPanel>
+
+            <StackPanel Margin="10,0,20,20" Grid.Row="1" Grid.Column="2" TextBlock.FontSize="14">
+                <TextBlock Name ="curAllocs" Text="0"/>
+                <TextBlock Name ="curAllocN" Text="0"/>
+                <TextBlock Name ="curAllocB" Text="0"/>
+                <TextBlock Name ="curAllocU" Text="0"/>
+                <TextBlock Name ="curFree" Text="0"/>
+
+
+            </StackPanel>
+
+
+        </Grid>
+
+    </DockPanel>
+</Window>

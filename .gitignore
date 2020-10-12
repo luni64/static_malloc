@@ -1,4 +1,6 @@
 makefile
-**/extras/**
+**/.vs/**
+**/obj/**
+**/bin/**
 **/.vscode/**
 **/.vsteensy/**
