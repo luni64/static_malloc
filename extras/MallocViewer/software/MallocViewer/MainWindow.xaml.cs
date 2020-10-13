@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO.Ports;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -14,6 +15,10 @@ namespace MallocViewer
 {
     public partial class MainWindow : Window
     {
+        const int columns = 800;  // match col/row with firmware
+        const int rows = 70;
+        const int barHeight = 8;
+     
         public MainWindow()
         {
             InitializeComponent();
@@ -25,12 +30,48 @@ namespace MallocViewer
             watcher.ConnectionChanged += ConnectedTeensiesChanged;   // get notifications about plugged in/out Teensies          
             ConnectedTeensiesChanged(null, null);                    // fill combobox initially
 
-            worker.DoWork += getData;
+            worker.DoWork += doWork;
         }
 
-        const int columns = 800;  // match with firmware
-        const int rows = 70;
-        const int barHeight = 8;
+        #region background work -----------------------------------------------------------
+
+        private void doWork(object sender, DoWorkEventArgs e)
+        {
+            if (Teensy == null) return;
+
+            Dispatcher.Invoke(() =>   
+            {
+                btnStart.IsEnabled = false;
+                btnStop.IsEnabled = true;
+            });
+
+            using (var port = new SerialPort(Teensy.Port))
+            {
+                port.Open();
+                port.DiscardInBuffer();
+
+                port.Write("c"); // clear memory              
+
+                while (run)
+                {
+                    var cmd = new char[] { '*' };
+                    try
+                    {
+                        port.Write("*");
+                        var line = port.ReadLine();
+                        Dispatcher.Invoke(() => Parse(line));
+                    }
+                    catch { }
+                }
+                port.Close();
+            }
+
+            Dispatcher.Invoke(() =>
+            {
+                btnStart.IsEnabled = true;
+                btnStop.IsEnabled = false;
+            });
+        }
 
         void Parse(string line)
         {
@@ -57,23 +98,32 @@ namespace MallocViewer
             curFree.Text = totalFree.ToString();
         }
 
-        private void getData(object sender, DoWorkEventArgs e)
+        private void StartButton_Click(object sender, RoutedEventArgs e)
         {
-            while (run)
+            if (!worker.IsBusy)
             {
-                var cmd = new char[] { '*' };
-                try
+                foreach (var a in allocations)
                 {
-                    port.Write(cmd, 0, 1);
-                    var line = port.ReadLine();
-                    Dispatcher.Invoke(() => Parse(line));
+                    removeMem(a.Key);
                 }
-                catch { }
+                allocs = 0; 
+
+                run = true;
+                worker.RunWorkerAsync();
             }
         }
 
+        private void StopButton_Click(object sender, RoutedEventArgs e)
+        {
+            run = false;
+        }
 
-        Dictionary<int, List<Rectangle>> allocations = new Dictionary<int, List<Rectangle>>();
+        readonly BackgroundWorker worker = new BackgroundWorker();
+
+        private bool run = true;
+        #endregion
+
+        #region drawing -------------------------------------------------------------------
 
         private List<Rectangle> drawRegion(int start, int end, Brush fillCol)
         {
@@ -87,14 +137,16 @@ namespace MallocViewer
 
             while (curCol + curWidth >= columns)
             {
-                r = new Rectangle();
-                r.Fill = fillCol;
-                r.Stroke = fillCol;
-                r.StrokeThickness = 0.2;
-                r.RadiusX = barHeight / 2.5;
-                r.RadiusY = barHeight / 2.5;
-                r.Height = barHeight;
-                r.Width = columns - curCol;
+                r = new Rectangle
+                {
+                    Fill = fillCol,
+                    Stroke = fillCol,
+                    StrokeThickness = 0.2,
+                    RadiusX = barHeight / 3,
+                    RadiusY = barHeight / 3,
+                    Height = barHeight,
+                    Width = columns - curCol
+                };
                 Canvas.SetLeft(r, curCol);
                 Canvas.SetTop(r, barHeight * curRow);
                 rlist.Add(r);
@@ -104,14 +156,16 @@ namespace MallocViewer
                 curRow++;
             }
 
-            r = new Rectangle();
-            r.Fill = fillCol;
-            r.Stroke = Brushes.White;
-            r.StrokeThickness = 0.2;
-            r.Height = barHeight;
-            r.Width = curWidth;
-            r.RadiusX = barHeight / 2.0;
-            r.RadiusY = barHeight / 2.0;
+            r = new Rectangle
+            {
+                Fill = fillCol,
+                Stroke = Brushes.White,
+                StrokeThickness = 0.2,
+                Height = barHeight,
+                Width = curWidth,
+                RadiusX = barHeight / 3,
+                RadiusY = barHeight / 3
+            };
             Canvas.SetLeft(r, curCol);
             Canvas.SetTop(r, barHeight * curRow);
             rlist.Add(r);
@@ -128,10 +182,7 @@ namespace MallocViewer
                 Random rand = new Random();
                 Brush brush = new SolidColorBrush(Color.FromRgb((byte)rand.Next(50, 256), 0, 0));
 
-
                 list.AddRange(drawRegion(blockStart, blockEnd, brush));
-
-
                 allocations.Add(idx, list);
 
                 foreach (var rect in allocations[idx])
@@ -153,69 +204,13 @@ namespace MallocViewer
             }
         }
 
+        private readonly Dictionary<int, List<Rectangle>> allocations = new Dictionary<int, List<Rectangle>>();
 
+        private int allocs = 0;
+        #endregion
 
-
-        BackgroundWorker worker = new BackgroundWorker();
-
-        private void StartButton_Click(object sender, RoutedEventArgs e)
-        {
-            var cmd = new char[] { 'S' };
-            port.Write(cmd, 0, 1);
-            var s = port.ReadLine();
-
-
-
-            foreach(var a in allocations)
-            {
-                removeMem(a.Key);
-            }
-
-            run = true;
-
-            worker = new BackgroundWorker();
-            worker.DoWork += getData;
-
-            worker.RunWorkerAsync();
-            btnStart.IsEnabled = false;
-            btnStop.IsEnabled = true;
-        }
-
-        private void StopButton_Click(object sender, RoutedEventArgs e)
-        {
-            run = false;
-            btnStop.IsEnabled = false;
-            btnStart.IsEnabled = true;
-            while (worker.IsBusy) ;
-
-            ConnectButton_Click(null, null);
-        }
-
-        private void ConnectButton_Click(object sender, RoutedEventArgs e)
-        {
-            // close if already open           
-            port?.Close();
-            port = null;
-            conText.Text = $"Not connected";
-
-            var Teensy = cbTeensy.SelectedItem as USB_Device;
-            if (Teensy != null)
-            {
-                try
-                {
-                    port = new SerialPort(Teensy.Port);
-                    port.Open();
-                    port.DiscardInBuffer();
-                    //port.ReadTimeout = 100;
-                    //port.WriteTimeout = 100;
-
-                    conText.Text = $"Connected to {Teensy.BoardId.ToString()} on {Teensy.Port}";
-                    btnStart.IsEnabled = true;
-                }
-                catch { }
-            }
-        }
-
+        #region Connected Teensy ----------------------------------------------------------
+        USB_Device Teensy;
         private void ConnectedTeensiesChanged(object sender, ConnectionChangedEventArgs e)
         {
             Dispatcher.Invoke(() =>
@@ -226,22 +221,24 @@ namespace MallocViewer
                     cbTeensy.Items.Add(Teensy);
                 }
                 cbTeensy.SelectedIndex = 0;
+                Teensy = cbTeensy.SelectedItem as USB_Device;
             }
             );
-        }
 
-        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        }
+        private readonly TeensyWatcher watcher;
+
+        #endregion
+
+        private async void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            port?.Close();
-            port = null;
-        }
-
-        private SerialPort port;
-        private TeensyWatcher watcher;
-        private int allocs = 0;
-        private bool run = true;
-
-
+            run = false;            
+            while(worker.IsBusy)
+            {
+                await Task.Delay(10);
+            }
+            worker.Dispose();
+        }                           
     }
 }
 

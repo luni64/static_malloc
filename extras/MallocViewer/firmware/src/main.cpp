@@ -12,19 +12,19 @@ constexpr unsigned maxChunkLen = 250;
 void* chunks[nrOfChunks];
 uint8_t myHeap[heapSize];
 
+
 void setup()
 {
-    sm_set_default_pool(myHeap, sizeof(myHeap), false, onError);
+    pinMode(LED_BUILTIN, OUTPUT);
     memset(chunks, 0, sizeof(chunks));
+    sm_set_default_pool(myHeap, sizeof(myHeap), false, onError);
 }
 
 void loop()
 {
     if (Serial.available())
     {
-        int cmd = Serial.read();
-
-        switch (cmd)
+        switch (Serial.read())
         {
             case '*': // allocate/deallocate
             {
@@ -45,17 +45,26 @@ void loop()
                 break;
             }
 
-            case 'S':
-                for (unsigned i = 0; i < maxChunkLen; i++)
+            case 'c': // clear all memory
+                for (unsigned i = 0; i < nrOfChunks; i++)
                 {
-                    if (chunks[i] != nullptr) sm_free(chunks[i]);
+                    if (chunks[i] != nullptr)
+                    {
+                        sm_free(chunks[i]);
+                        chunks[i] = nullptr;
+                    }
                 }
-                Serial.println("done");
                 break;
 
             default:
                 break;
         }
+    }
+    static elapsedMillis stopwatch = 0;
+    if (stopwatch > 500)
+    {
+        stopwatch = 0;
+        digitalToggle(LED_BUILTIN);
     }
 }
 

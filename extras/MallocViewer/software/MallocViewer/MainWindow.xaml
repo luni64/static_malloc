@@ -12,9 +12,9 @@
             <StatusBarItem Margin="5,2,5,2" >
                 <ComboBox Name="cbTeensy" Width="170" SelectedIndex="0" DisplayMemberPath="BoardId" />
             </StatusBarItem>
-            <StatusBarItem Margin="0,5,10,5" >
+            <!--<StatusBarItem Margin="0,5,10,5" >
                 <Button Content=" Connect " Click="ConnectButton_Click" />
-            </StatusBarItem>
+            </StatusBarItem>-->
             <StatusBarItem>
                 <TextBlock Name="conText" Text="Not connected" />
             </StatusBarItem>
@@ -31,7 +31,7 @@
             </Grid.RowDefinitions>
 
             <StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Margin="0,40,0,20" >
-                <Button Name="btnStart"  Content="Start" Width="80" Margin="0,0,20,0" Click="StartButton_Click" IsEnabled="False"/>
+                <Button Name="btnStart"  Content="Start" Width="80" Margin="0,0,20,0" Click="StartButton_Click" IsEnabled="True"    />
                 <Button Name ="btnStop" Content="Stop" Width="80" Click="StopButton_Click"/>
             </StackPanel>
 
