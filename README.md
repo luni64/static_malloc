@@ -46,3 +46,6 @@ void loop()
 Off course, smalloc also provides `sm_free` and `sm_calloc`. Additionally, it can be used to handle more than one memory pool in parallel and provides an "out of memory" callback.
 
 See the [examples folder](./examples/) in the sources for more examples.
+
+Here a quick video showing how sm_malloc allocs/frees memory. You can find the corresponding firmware and (Win10) software in the extras folder.
+[![Watch the video](https://img.youtube.com/vi/s3U5QSO7Rd8/0.jpg)](https://www.youtube.com/watch?v=s3U5QSO7Rd8)
